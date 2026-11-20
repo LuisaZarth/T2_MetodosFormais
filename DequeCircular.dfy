@@ -1,0 +1,59 @@
+class DequeCircular {
+  // Atributos concretos e framing
+  var arr: array<int>
+  var head: int
+  var count: int
+  ghost var Repr: set<object>
+
+  // Representação abstrata
+  ghost var Conteudo: seq<int>
+
+  // Invariante de consistência da classe
+  ghost predicate Valid()
+    reads this, Repr
+  {
+    this in Repr &&
+    arr in Repr &&
+    arr.Length > 0 &&
+    0 <= head < arr.Length &&
+    0 <= count <= arr.Length &&
+    |Conteudo| == count &&
+    (forall i :: 0 <= i < count ==> 
+        Conteudo[i] == arr[(head + i) % arr.Length])
+  }
+
+  // Construtor
+  constructor(capacidade: int)
+    requires capacidade > 0
+    ensures Valid()
+    ensures fresh(Repr)
+    ensures count == 0
+    ensures arr.Length == capacidade
+    ensures Conteudo == []
+  {
+    arr := new int[capacidade];
+    head := 0;
+    count := 0;
+    Conteudo := [];
+    Repr := {this, arr};
+  }
+
+  // Operações de consulta básica
+  function Tamanho(): (tam: int)
+    requires Valid()
+    reads Repr
+    ensures tam == count
+    ensures tam == |Conteudo|
+  {
+    count
+  }
+
+  function Capacidade(): (cap: int)
+    requires Valid()
+    reads Repr
+    ensures cap == arr.Length
+    ensures cap > 0
+  {
+    arr.Length
+  }
+}
