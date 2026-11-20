@@ -57,3 +57,46 @@ class DequeCircular {
     arr.Length
   }
 }
+
+//Verifica se o deque está cheio
+method EstaCheio() returns (cheio: bool)
+  requires Valid()
+  ensures Valid()
+  ensures cheio == (count == arr.Length)
+{
+  cheio := count == arr.Length;
+}
+
+//Adiciona um elemento ao final do deque
+method AdicionarFinal(valor: int)
+  requires Valid()
+  requires count < arr.Length
+  modifies Repr
+  ensures Valid()
+  ensures count == old(count) + 1
+  ensures Conteudo == old(Conteudo) + [valor]
+{
+  var pos := (head + count) % arr.Length;
+
+  arr[pos] := valor;
+  Conteudo := Conteudo + [valor];
+  count := count + 1;
+}
+
+//Adiciona um elemento ao inicio do deque
+method AdicionarInicio(valor: int)
+  requires Valid()
+  requires count < arr.Length
+  modifies Repr
+  ensures Valid()
+  ensures count == old(count) + 1
+  ensures Conteudo == [valor] + old(Conteudo)
+{
+  var novoHead := (head - 1 + arr.Length) % arr.Length;
+
+  arr[novoHead] := valor;
+  head := novoHead;
+  Conteudo := [valor] + Conteudo;
+  count := count + 1;
+}
+}
